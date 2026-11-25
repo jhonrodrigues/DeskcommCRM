@@ -52,8 +52,8 @@ export const TEXTOS_LANDING_PUBLICA = {
     es: "Programa reuniones y visitas en el CRM y conecta Google Calendar para sincronizar las citas.",
   },
   "Escolha um plano para a sua equipe.": { es: "Elige un plan para tu equipo." },
-  "Compare a duração do teste e os limites de cada plano antes de criar a conta.": {
-    es: "Compara la duración de la prueba y los límites de cada plan antes de crear la cuenta.",
+  "Confira os limites e as condições de teste antes de criar a conta.": {
+    es: "Consulta los límites y las condiciones de prueba antes de crear la cuenta.",
   },
   "por ano": { es: "al año" },
   "por mês": { es: "al mes" },

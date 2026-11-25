@@ -245,7 +245,7 @@ export function LandingPublica({ marca, idioma, planos, modo }: Props) {
             <h2>{t("Escolha um plano para a sua equipe.")}</h2>
             {planos.length > 0 && (
               <p>
-                {t("Compare a duração do teste e os limites de cada plano antes de criar a conta.")}
+                {t("Confira os limites e as condições de teste antes de criar a conta.")}
               </p>
             )}
           </div>

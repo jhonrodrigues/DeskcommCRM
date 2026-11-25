@@ -32,17 +32,22 @@ describe("/ — a página inicial pública", () => {
   // A verificação de um app que pede dados de conta Google abre o endereço
   // principal SEM entrar. Antes, `/` era só um redirect para o painel e o
   // revisor caía no login.
-  it("sem sessão: mostra o nome da marca, o que o produto faz e os links legais", async () => {
+  it("sem sessão: mostra a landing, links legais e acesso ao login", async () => {
     await montar();
 
-    expect(screen.getByRole("heading", { level: 1, name: "Marca da Revenda" })).toBeInTheDocument();
-    expect(screen.getByText(/Atendimento e vendas pelo WhatsApp/)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1, name: "Boas conversas.Grandes negócios." })).toBeInTheDocument();
+    expect(screen.getAllByText("Marca da Revenda").length).toBeGreaterThan(0);
+    expect(screen.getByText("Seu atendimento, suas oportunidades e sua equipe trabalhando juntos. Com inteligência artificial para transformar cada conversa em um próximo passo.")).toBeInTheDocument();
 
-    const politica = screen
-      .getAllByRole("link", { name: "Política de Privacidade" })
-      .map((a) => a.getAttribute("href"));
-    expect(politica).toContain("/legal/privacy");
-    expect(screen.getByRole("link", { name: "Termos de Uso" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Política de privacidade" })).toHaveAttribute(
+      "href",
+      "/legal/privacy#dados-do-google",
+    );
+    expect(screen.getByRole("link", { name: "Privacidade" })).toHaveAttribute(
+      "href",
+      "/legal/privacy",
+    );
+    expect(screen.getByRole("link", { name: "Termos de uso" })).toHaveAttribute(
       "href",
       "/legal/terms",
     );

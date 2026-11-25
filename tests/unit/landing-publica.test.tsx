@@ -42,15 +42,17 @@ describe("landing pública", () => {
 
   it("mostra o teste e os limites de cada plano e vincula o cadastro ao plano selecionado", () => {
     render(<LandingPublica marca={marca} idioma="pt-BR" modo="aberto" planos={[pago, teste]} />);
-    const cards = screen.getAllByRole("article").filter((card) => within(card).queryByRole("link"));
-    expect(within(cards[0]).getByText("Acesso após o primeiro pagamento")).toBeInTheDocument();
-    expect(within(cards[0]).getByRole("link", { name: "Escolher plano" })).toHaveAttribute(
+    const cardPago = screen.getByRole("heading", { name: "Equipe" }).closest("article");
+    const cardTeste = screen.getByRole("heading", { name: "Comercial" }).closest("article");
+    if (!cardPago || !cardTeste) throw new Error("Cards dos planos não encontrados");
+    expect(within(cardPago).getByText("Acesso após o primeiro pagamento")).toBeInTheDocument();
+    expect(within(cardPago).getByRole("link", { name: "Escolher plano" })).toHaveAttribute(
       "href",
       "/signup?plano=mensal",
     );
-    expect(within(cards[1]).getByText("7 dias de teste grátis")).toBeInTheDocument();
-    expect(within(cards[1]).getByText("Pessoas na equipe · 5")).toBeInTheDocument();
-    expect(within(cards[1]).getByRole("link", { name: "Começar teste grátis" })).toHaveAttribute(
+    expect(within(cardTeste).getByText("7 dias de teste grátis")).toBeInTheDocument();
+    expect(within(cardTeste).getByText("Pessoas na equipe · 5")).toBeInTheDocument();
+    expect(within(cardTeste).getByRole("link", { name: "Começar teste grátis" })).toHaveAttribute(
       "href",
       "/signup?plano=anual",
     );

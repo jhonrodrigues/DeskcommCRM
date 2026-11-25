@@ -1,340 +1,352 @@
 import Link from "next/link";
 import {
-  ArrowDownRight,
+  ArrowDown,
   ArrowRight,
-  Bot,
   CalendarDays,
-  ChartNoAxesColumnIncreasing,
-  MessageCircle,
-  MoveUpRight,
-  Sparkles,
+  Check,
+  ChevronDown,
+  Columns3,
+  MessagesSquare,
 } from "lucide-react";
+
+import { LogotipoDoProduto } from "@/components/branding/MarcaDoProduto";
+import { marcaEhADoProduto } from "@/lib/branding";
+import type { MarcaDeSaida } from "@/lib/branding/saida";
+import type { ModoDeCadastro } from "@/lib/auth/politica-de-cadastro";
+import type { PlanoDoCadastro } from "@/lib/cobranca/cadastro";
 import { traduzir } from "@/lib/i18n/dicionario";
 import type { Idioma } from "@/lib/i18n/idiomas";
+
 import styles from "./landing-publica.module.css";
 
-export function LandingPublica({ nome, idioma = "pt-BR" }: { nome: string; idioma?: Idioma }) {
+type MarcaDaLanding = Pick<MarcaDeSaida, "nome" | "logoUrl" | "logoDarkUrl">;
+type Props = {
+  marca: MarcaDaLanding;
+  idioma: Idioma;
+  planos: readonly PlanoDoCadastro[];
+  modo: ModoDeCadastro;
+};
+
+function Logotipo({ marca }: { marca: MarcaDaLanding }) {
+  const logo = marca.logoUrl || marca.logoDarkUrl;
+  if (logo) {
+    // A URL configurada pode pertencer a qualquer domínio do operador.
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img src={logo} alt={marca.nome} className={styles.logo} />;
+  }
+  if (marcaEhADoProduto({ name: marca.nome, logoUrl: null })) {
+    return <LogotipoDoProduto nome={marca.nome} className={styles.logo} />;
+  }
+  return <span>{marca.nome}</span>;
+}
+
+export function LandingPublica({ marca, idioma, planos, modo }: Props) {
   const t = (texto: string) => traduzir(texto, idioma);
+
+  const captacao = [
+    {
+      nome: "Meta Lead Ads",
+      detalhe: t(
+        "Receba no funil os contatos dos formulários do Facebook e Instagram após conectar a página e configurar a fonte.",
+      ),
+    },
+    {
+      nome: "Google Ads",
+      detalhe: t(
+        "Identifique a origem das conversas que começam em anúncios e seguem para o WhatsApp pela sua página.",
+      ),
+    },
+    {
+      nome: t("Formulários e sites"),
+      detalhe: t(
+        "Envie os dados de formulários, landing pages e ferramentas externas ao CRM por webhook, na etapa que você escolher.",
+      ),
+    },
+  ];
+
+  const rotina = [
+    {
+      icon: MessagesSquare,
+      titulo: t("Atendimento pelo WhatsApp"),
+      detalhe: t(
+        "A equipe acompanha as conversas em uma caixa compartilhada. Agentes de IA podem responder, qualificar e passar o atendimento para uma pessoa.",
+      ),
+    },
+    {
+      icon: Columns3,
+      titulo: t("Funil e follow-up"),
+      detalhe: t(
+        "Veja a origem de cada oportunidade, organize o funil do seu jeito e configure quando retomar conversas que ficaram sem resposta.",
+      ),
+    },
+    {
+      icon: CalendarDays,
+      titulo: t("Agenda e próximos passos"),
+      detalhe: t(
+        "Marque reuniões e visitas no CRM e conecte o Google Agenda para sincronizar os compromissos.",
+      ),
+    },
+  ];
+
+  const duvidas = [
+    {
+      pergunta: t("Posso usar meu número de WhatsApp?"),
+      resposta: t(
+        "Você pode conectar um número por QR code ou configurar a API oficial da Meta. O número de conexões disponíveis depende da modalidade e dos limites do plano.",
+      ),
+    },
+    {
+      pergunta: t("A equipe pode assumir uma conversa?"),
+      resposta: t(
+        "Sim. Você pode configurar quando a IA passa o atendimento para alguém da equipe. A pessoa assume a conversa com o histórico em mãos.",
+      ),
+    },
+    {
+      pergunta: t("Preciso conectar tudo antes de começar?"),
+      resposta: t(
+        "Você pode começar por um canal, montar seu funil e adicionar as demais integrações conforme a operação precisar. Cada fonte de captação tem sua própria configuração.",
+      ),
+    },
+  ];
+
+  const porConvite = modo === "so_convite";
+  const comAprovacao = modo === "com_aprovacao";
+  const destino = planos.length ? "#planos" : porConvite ? "/login" : "/signup";
+  const acao = planos.length
+    ? t("Ver planos")
+    : porConvite
+      ? t("Acessar CRM")
+      : comAprovacao
+        ? t("Solicitar acesso")
+        : t("Criar conta");
+
+  function preco(centavos: number, moeda: string) {
+    return new Intl.NumberFormat(idioma, {
+      style: "currency",
+      currency: moeda,
+      maximumFractionDigits: centavos % 100 === 0 ? 0 : 2,
+      minimumFractionDigits: centavos % 100 === 0 ? 0 : 2,
+    }).format(centavos / 100);
+  }
+
   return (
     <div className={styles.site} id="inicio">
       <header className={styles.header}>
-        <div className={styles.container + " " + styles.headerInner}>
-          <a className={styles.brand} href="#inicio">
-            <span className={styles.brandMark}>✳</span>
-            <span>{nome}</span>
+        <div className={styles.headerInner}>
+          <a href="#inicio" className={styles.brand}>
+            <Logotipo marca={marca} />
           </a>
-          <nav className={styles.navigation} aria-label={t("Navegação principal")}>
-            <a href="#solucao">{t("A solução")}</a>
-            <a href="#como-funciona">{t("Como funciona")}</a>
-            <a href="#duvidas">{t("Dúvidas")}</a>
+          <nav aria-label={t("Navegação principal")} className={styles.nav}>
+            <a href="#captacao">{t("Captação")}</a>
+            <a href="#recursos">{t("Recursos")}</a>
+            <a href="#planos">{t("Planos")}</a>
           </nav>
           <div className={styles.headerActions}>
-            <Link className={styles.login} href="/login">
+            <Link href="/login" className={styles.login}>
               {t("Entrar")}
             </Link>
-            <a className={styles.headerCta} href="#solucao">
-              {t("Explorar o CRM")} <MoveUpRight size={15} />
-            </a>
+            <Link href={destino} className={styles.button}>
+              {acao}
+              <ArrowRight size={16} aria-hidden />
+            </Link>
           </div>
         </div>
       </header>
-      <main id="conteudo">
+
+      <main>
         <section className={styles.hero}>
-          <div className={styles.container + " " + styles.heroGrid}>
-            <div className={styles.heroCopy}>
-              <div className={styles.heroTag}>
-                <span /> {t("CRM + INTELIGÊNCIA ARTIFICIAL")}
-              </div>
-              <h1>
-                {t("Boas conversas.")}
-                <br />
-                <em>{t("Grandes negócios.")}</em>
-              </h1>
-              <p>
-                {t(
-                  "Seu atendimento, suas oportunidades e sua equipe trabalhando juntos. Com inteligência artificial para transformar cada conversa em um próximo passo.",
-                )}
-              </p>
-              <div className={styles.heroActions}>
-                <a className={styles.primary} href="/login">
-                  {t("Acessar CRM")} <ArrowRight size={18} />
-                </a>
-                <a className={styles.secondary} href="#solucao">
-                  {t("Explorar o CRM")} <ArrowDownRight size={18} />
-                </a>
-              </div>
-              <div className={styles.heroNote}>
-                <span className={styles.noteIcon}>
-                  <Sparkles size={16} />
-                </span>{" "}
-                {t("Feito para negócios que crescem conversando.")}
-              </div>
-            </div>
-            <div className={styles.productWrap}>
-              <div className={styles.productTop}>
-                <span>{t("UMA VISÃO DA SUA OPERAÇÃO")}</span>
-                <span>{t("EXEMPLO ILUSTRATIVO")}</span>
-              </div>
-              <div
-                className={styles.product}
-                aria-label={t("Exemplo ilustrativo do acompanhamento de oportunidades")}
-              >
-                <div className={styles.productHeader}>
-                  <div className={styles.productLogo}>
-                    <span>✳</span> {nome}
-                  </div>
-                  <div className={styles.productDots}>
-                    <i />
-                    <i />
-                    <i />
-                  </div>
-                </div>
-                <div className={styles.productBody}>
-                  <div className={styles.productSidebar}>
-                    <span className={styles.activeSide}>
-                      <ChartNoAxesColumnIncreasing size={17} /> {t("Visão geral")}
-                    </span>
-                    <span>
-                      <MessageCircle size={17} /> {t("Conversas")}
-                    </span>
-                    <span>
-                      <CalendarDays size={17} /> {t("Agenda")}
-                    </span>
-                    <span>
-                      <Bot size={17} /> {t("Agentes de IA")}
-                    </span>
-                  </div>
-                  <div className={styles.dashboard}>
-                    <div className={styles.dashHeading}>
-                      <div>
-                        <small>{t("SEU ESPAÇO DE TRABALHO")}</small>
-                        <h2>{t("Oportunidades")}</h2>
-                      </div>
-                      <span>{t("Funil comercial")}</span>
-                    </div>
-                    <div className={styles.board}>
-                      <div>
-                        <div className={styles.columnTitle}>
-                          {t("Novos contatos")} <span>02</span>
-                        </div>
-                        <div className={styles.lead}>
-                          <b>Marina Costa</b>
-                          <small>{t("Interesse em serviços")}</small>
-                          <span>{t("Nova conversa")}</span>
-                        </div>
-                        <div className={styles.lead}>
-                          <b>Lucas Oliveira</b>
-                          <small>{t("Quer saber mais")}</small>
-                        </div>
-                      </div>
-                      <div>
-                        <div className={styles.columnTitle}>
-                          {t("Em conversa")} <span>01</span>
-                        </div>
-                        <div className={styles.lead}>
-                          <b>Camila Almeida</b>
-                          <small>{t("Conhecendo a solução")}</small>
-                          <span className={styles.greenTag}>{t("IA em atendimento")}</span>
-                        </div>
-                      </div>
-                      <div>
-                        <div className={styles.columnTitle}>
-                          {t("Próximo passo")} <span>01</span>
-                        </div>
-                        <div className={styles.lead}>
-                          <b>Rafael Santos</b>
-                          <small>{t("Reunião agendada")}</small>
-                          <span>{t("Equipe comercial")}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className={styles.productCaption}>
-                <span className={styles.captionIcon}>
-                  <Sparkles size={18} />
-                </span>
-                <div>
-                  <strong>{t("Mais contexto em cada conversa.")}</strong>
-                  <small>{t("Pessoas e IA, no mesmo fluxo de trabalho.")}</small>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className={styles.heroBottom}>
-            <div className={styles.container}>
-              <span>{t("ATENDIMENTO MAIS CONECTADO")}</span>
-              <strong>WhatsApp</strong>
-              <strong>{t("Agentes de IA")}</strong>
-              <strong>{t("Funil de vendas")}</strong>
-              <strong>{t("Agenda")}</strong>
-            </div>
-          </div>
-        </section>
-        <section className={styles.solutions + " " + styles.container} id="solucao">
-          <div className={styles.sectionHeader}>
-            <div>
-              <span>{t("UMA OPERAÇÃO, MUITAS POSSIBILIDADES")}</span>
-              <h2>
-                {t("Seu comercial merece")}
-                <br />
-                {t("mais do que ferramentas soltas.")}
-              </h2>
-            </div>
-            <p>
+          <div className={styles.heroCopy}>
+            <p className={styles.eyebrow}>{t("CRM para equipes comerciais")}</p>
+            <h1>{t("Do primeiro contato à próxima venda.")}</h1>
+            <p className={styles.intro}>
               {t(
-                "Do primeiro contato ao próximo passo: acompanhe o que importa e dê à sua equipe o contexto para agir.",
+                "Receba leads de anúncios e formulários, atenda pelo WhatsApp e acompanhe cada oportunidade até o fechamento.",
               )}
             </p>
-          </div>
-          <div className={styles.featureGrid}>
-            <article>
-              <MessageCircle />
-              <h3>{t("Conversas que continuam")}</h3>
-              <p>
-                {t(
-                  "Reúna o atendimento e consulte o histórico antes de responder. Cada conversa mantém seu contexto.",
-                )}
-              </p>
-            </article>
-            <article>
-              <Bot />
-              <h3>{t("IA que trabalha com você")}</h3>
-              <p>
-                {t(
-                  "Agentes ajudam a responder e qualificar interesses, com passagem para uma pessoa quando necessário.",
-                )}
-              </p>
-            </article>
-            <article>
-              <ChartNoAxesColumnIncreasing />
-              <h3>{t("Clareza em cada etapa")}</h3>
-              <p>
-                {t(
-                  "Acompanhe oportunidades no funil e entenda o próximo passo do seu processo comercial.",
-                )}
-              </p>
-            </article>
-            <article>
-              <CalendarDays />
-              <h3>{t("Agenda conectada")}</h3>
-              <p>
-                {t(
-                  "Com o Google Agenda conectado, consulte horários e gerencie agendamentos pelo atendimento.",
-                )}
-              </p>
-            </article>
-          </div>
-        </section>
-        <section className={styles.process} id="como-funciona">
-          <div className={styles.container + " " + styles.processGrid}>
-            <div>
-              <span className={styles.processLabel}>{t("MENOS FRICÇÃO. MAIS CONTINUIDADE.")}</span>
-              <h2>{t("O melhor atendimento acontece quando tudo se conecta.")}</h2>
-              <p>
-                {t(
-                  "Um fluxo mais claro para quem chega e para quem está do outro lado da conversa.",
-                )}
-              </p>
-              <a href="#solucao" className={styles.lightButton}>
-                {t("Explorar o CRM")} <ArrowRight size={18} />
+            <div className={styles.actions}>
+              <Link href={destino} className={styles.button}>
+                {acao}
+                <ArrowRight size={18} aria-hidden />
+              </Link>
+              <a href="#captacao" className={styles.textLink}>
+                {t("Como funciona")}
+                <ArrowDown size={17} aria-hidden />
               </a>
             </div>
-            <ol>
+          </div>
+
+          <figure className={styles.journey}>
+            <div className={styles.journeyHeader}>
+              <span>{t("Uma oportunidade no CRM")}</span>
+              <small>{t("Exemplo de fluxo")}</small>
+            </div>
+            <ol className={styles.timeline}>
               <li>
-                <span>01</span>
+                <span aria-hidden />
                 <div>
-                  <h3>{t("O cliente entra em contato")}</h3>
-                  <p>
-                    {t("A conversa chega pelo WhatsApp e passa a fazer parte da sua operação.")}
-                  </p>
+                  <small>{t("Captação")}</small>
+                  <strong>{t("Formulário do Instagram recebido")}</strong>
                 </div>
               </li>
               <li>
-                <span>02</span>
+                <span aria-hidden />
                 <div>
-                  <h3>{t("A IA ajuda a entender a necessidade")}</h3>
-                  <p>
-                    {t(
-                      "O agente pode responder e qualificar o interesse com base no contexto disponível.",
-                    )}
-                  </p>
+                  <small>WhatsApp</small>
+                  <strong>{t("Interesse e disponibilidade confirmados")}</strong>
                 </div>
               </li>
               <li>
-                <span>03</span>
+                <span aria-hidden />
                 <div>
-                  <h3>{t("Sua equipe segue com contexto")}</h3>
-                  <p>{t("As oportunidades avançam e as pessoas assumem quando necessário.")}</p>
+                  <small>{t("Agenda")}</small>
+                  <strong>{t("Visita marcada para a equipe comercial")}</strong>
                 </div>
               </li>
             </ol>
-          </div>
+          </figure>
         </section>
-        <section className={styles.faq + " " + styles.container} id="duvidas">
-          <div>
-            <span>{t("PERGUNTAS FREQUENTES")}</span>
-            <h2>
-              {t("Simples para começar.")}
-              <br />
-              {t("Completo para evoluir.")}
-            </h2>
+
+        <section className={styles.section} id="captacao">
+          <div className={styles.sectionHeading}>
+            <p className={styles.eyebrow}>{t("Captação de leads")}</p>
+            <h2>{t("Saiba de onde veio cada oportunidade.")}</h2>
           </div>
-          <div className={styles.faqList}>
-            <details>
-              <summary>{t("A equipe pode assumir uma conversa?")}</summary>
-              <p>
-                {t(
-                  "Sim. O agente pode encaminhar o atendimento para uma pessoa, que acompanha o histórico pelo CRM.",
-                )}
-              </p>
-            </details>
-            <details>
-              <summary>{t("Como funciona a integração com a agenda?")}</summary>
-              <p>
-                {t(
-                  "Com o Google Agenda conectado, o CRM pode mostrar horários e criar, alterar ou cancelar agendamentos solicitados pela pessoa.",
-                )}
-              </p>
-            </details>
-            <details>
-              <summary>{t("O CRM se conecta ao Google Ads?")}</summary>
-              <p>
-                {t(
-                  "Quando configurada, a integração pode devolver ao Google Ads informações de vendas associadas aos anúncios. Saiba mais na",
-                )}{" "}
-                <Link href="/legal/privacy#dados-do-google">{t("Política de privacidade")}</Link>.
-              </p>
-            </details>
-          </div>
+          <dl className={styles.sources}>
+            {captacao.map(({ nome, detalhe }) => (
+              <div key={nome}>
+                <dt>{nome}</dt>
+                <dd>{detalhe}</dd>
+              </div>
+            ))}
+          </dl>
         </section>
-        <section className={styles.closing}>
-          <div className={styles.container + " " + styles.closingInner}>
-            <div>
-              <span>{t("O PRÓXIMO PASSO COMEÇA AQUI")}</span>
-              <h2>
-                {t("Faça cada conversa")}
-                <br />
-                {t("contar para o seu negócio.")}
-              </h2>
-              <p>{t("Conheça uma forma mais conectada de atender e vender.")}</p>
+
+        <section className={styles.operation} id="recursos">
+          <div className={styles.operationInner}>
+            <div className={styles.sectionHeading}>
+              <p className={styles.eyebrow}>{t("Rotina comercial")}</p>
+              <h2>{t("Depois que o lead chega, o trabalho continua.")}</h2>
             </div>
-            <a className={styles.primary} href="/login">
-              {t("Acessar CRM")} <ArrowRight size={18} />
-            </a>
+            <div className={styles.features}>
+              {rotina.map(({ icon: Icon, titulo, detalhe }) => (
+                <article key={titulo}>
+                  <Icon size={24} strokeWidth={1.5} aria-hidden />
+                  <h3>{titulo}</h3>
+                  <p>{detalhe}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className={styles.section} id="planos">
+          <div className={styles.sectionHeading}>
+            <p className={styles.eyebrow}>{t("Planos")}</p>
+            <h2>{t("Escolha um plano para a sua equipe.")}</h2>
+            {planos.length > 0 && (
+              <p>
+                {t("Compare a duração do teste e os limites de cada plano antes de criar a conta.")}
+              </p>
+            )}
+          </div>
+          {planos.length ? (
+            <div className={styles.plans}>
+              {planos.map((plano) => (
+                <article key={plano.id} className={styles.plan}>
+                  <h3>{plano.nome}</h3>
+                  <p className={styles.price}>
+                    {preco(plano.preco_cents, plano.moeda)}{" "}
+                    <small>{plano.intervalo === "ano" ? t("por ano") : t("por mês")}</small>
+                  </p>
+                  <p className={styles.trial}>
+                    {plano.trial_dias > 0
+                      ? plano.trial_dias === 1
+                        ? t("1 dia de teste grátis")
+                        : t("{dias} dias de teste grátis").replace(
+                            "{dias}",
+                            String(plano.trial_dias),
+                          )
+                      : t("Acesso após o primeiro pagamento")}
+                  </p>
+                  {plano.recursos && (
+                    <ul>
+                      <li>
+                        <Check size={16} aria-hidden />
+                        {t("Pessoas na equipe")} ·{" "}
+                        {plano.recursos.assentos ?? t("Sem limite no plano")}
+                      </li>
+                      <li>
+                        <Check size={16} aria-hidden />
+                        {t("Números de WhatsApp")} ·{" "}
+                        {plano.recursos.canais ?? t("Sem limite no plano")}
+                      </li>
+                      {plano.recursos.ia_usd_cents !== null && (
+                        <li>
+                          <Check size={16} aria-hidden />
+                          {t("Teto de IA por mês")} · {preco(plano.recursos.ia_usd_cents, "USD")}
+                        </li>
+                      )}
+                    </ul>
+                  )}
+                  {!porConvite && (
+                    <Link
+                      href={`/signup?plano=${encodeURIComponent(plano.id)}`}
+                      className={styles.button}
+                    >
+                      {comAprovacao
+                        ? t("Solicitar acesso")
+                        : plano.trial_dias > 0
+                          ? t("Começar teste grátis")
+                          : t("Escolher plano")}
+                      <ArrowRight size={16} aria-hidden />
+                    </Link>
+                  )}
+                </article>
+              ))}
+            </div>
+          ) : (
+            <p>{t("Nenhum plano está disponível para contratação online no momento.")}</p>
+          )}
+          {comAprovacao && (
+            <p className={styles.planNote}>{t("O cadastro está sujeito à aprovação.")}</p>
+          )}
+          {porConvite && <p className={styles.planNote}>{t("O cadastro é feito por convite.")}</p>}
+          {planos.some((plano) => plano.recursos?.ia_usd_cents != null) && (
+            <p className={styles.planNote}>
+              {t(
+                "O teto de IA indicado se aplica quando a empresa usa a chave de IA da plataforma.",
+              )}
+            </p>
+          )}
+        </section>
+
+        <section className={`${styles.section} ${styles.faq}`} id="duvidas">
+          <div className={styles.sectionHeading}>
+            <p className={styles.eyebrow}>{t("Dúvidas")}</p>
+            <h2>{t("Antes de começar")}</h2>
+          </div>
+          <div>
+            {duvidas.map(({ pergunta, resposta }) => (
+              <details key={pergunta}>
+                <summary>
+                  {pergunta}
+                  <ChevronDown size={18} aria-hidden />
+                </summary>
+                <p>{resposta}</p>
+              </details>
+            ))}
           </div>
         </section>
       </main>
+
       <footer className={styles.footer}>
-        <div className={styles.container + " " + styles.footerInner}>
-          <a className={styles.brand} href="#inicio">
-            <span className={styles.brandMark}>✳</span>
-            <span>{nome}</span>
+        <div className={styles.footerInner}>
+          <a href="#inicio" className={styles.brand}>
+            <Logotipo marca={marca} />
           </a>
-          <p>{t("Conversas que movem negócios.")}</p>
           <nav aria-label={t("Links legais")}>
             <Link href="/legal/privacy">{t("Privacidade")}</Link>
+            <Link href="/legal/privacy#dados-do-google">{t("Dados do Google")}</Link>
             <Link href="/legal/terms">{t("Termos de uso")}</Link>
           </nav>
         </div>

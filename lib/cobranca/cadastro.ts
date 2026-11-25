@@ -12,6 +12,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { moduloLigado } from "@/lib/instalacao/modulos";
+import { declararPlano, type RecursosDoPlano } from "./planos";
+import { RECURSOS, RECURSOS_DO_PLANO } from "./vocabulario";
+
+const CAMPOS_DO_CADASTRO = "id, nome, preco_cents, moeda, intervalo, trial_dias";
 
 export interface PlanoDoCadastro {
   id: string;
@@ -21,6 +25,7 @@ export interface PlanoDoCadastro {
   moeda: string;
   intervalo: string;
   trial_dias: number;
+  recursos?: RecursosDoPlano;
 }
 
 export interface PlanosDoCadastro {
@@ -29,11 +34,19 @@ export interface PlanosDoCadastro {
 }
 
 /** `null` quando a leitura falhou: quem decide uma AÇÃO trata como recusa. */
-export async function lerPlanosDoCadastro(admin: SupabaseClient): Promise<PlanosDoCadastro | null> {
+export async function lerPlanosDoCadastro(
+  admin: SupabaseClient,
+  comRecursos = false,
+): Promise<PlanosDoCadastro | null> {
+  const campos = comRecursos
+    ? [CAMPOS_DO_CADASTRO, ...RECURSOS_DO_PLANO.map((recurso) => RECURSOS[recurso].coluna)].join(
+        ", ",
+      )
+    : CAMPOS_DO_CADASTRO;
   const [oferecidos, padrao] = await Promise.all([
     admin
       .from("cobranca_planos")
-      .select("id, nome, preco_cents, moeda, intervalo, trial_dias")
+      .select(campos)
       .is("arquivado_em", null)
       .eq("oferecido_ao_cliente", true)
       .order("preco_cents"),
@@ -47,7 +60,11 @@ export async function lerPlanosDoCadastro(admin: SupabaseClient): Promise<Planos
   if (oferecidos.error || padrao.error) return null;
   return {
     padraoId: padrao.data?.id ?? null,
-    oferecidos: oferecidos.data ?? [],
+    oferecidos: ((oferecidos.data ?? []) as unknown as PlanoDoCadastro[]).map((linha) => {
+      const { id, nome, preco_cents, moeda, intervalo, trial_dias } = linha;
+      const plano = { id, nome, preco_cents, moeda, intervalo, trial_dias };
+      return comRecursos ? { ...plano, recursos: declararPlano(linha).recursos } : plano;
+    }),
   };
 }
 
@@ -68,16 +85,22 @@ export interface CadastroNaTela {
  * desligada, ou leitura que falha: nada — a tela não esconde nem exige coisa
  * alguma, e quem recusa é a action (e, por baixo dela, o gatilho).
  */
-export async function lerCadastroNaTela(admin: SupabaseClient): Promise<CadastroNaTela> {
+export async function lerCadastroNaTela(
+  admin: SupabaseClient,
+  comRecursos = false,
+): Promise<CadastroNaTela> {
   const nada: CadastroNaTela = { oferecidos: [], padraoId: null, exigeEscolha: false };
   if (!(await moduloLigado(admin, "cobranca"))) return nada;
-  const lidos = await lerPlanosDoCadastro(admin);
+  const lidos = await lerPlanosDoCadastro(admin, comRecursos);
   if (!lidos) return nada;
   return { ...lidos, exigeEscolha: cadastroExigeEscolhaDePlano(lidos) };
 }
 
 /** O plano que o seletor já traz marcado: o padrão, quando ele está entre os oferecidos. */
-export function planoInicialDoSeletor(oferecidos: readonly PlanoDoCadastro[], padraoId: string | null): string | undefined {
+export function planoInicialDoSeletor(
+  oferecidos: readonly PlanoDoCadastro[],
+  padraoId: string | null,
+): string | undefined {
   return oferecidos.find((p) => p.id === padraoId)?.id ?? oferecidos[0]?.id;
 }
 

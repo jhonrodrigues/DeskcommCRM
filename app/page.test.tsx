@@ -16,7 +16,12 @@ vi.mock("@/lib/supabase/server", () => ({
   }),
 }));
 vi.mock("@/lib/i18n/idiomaAnonimo", () => ({ idiomaDoVisitante: async () => "pt-BR" }));
-vi.mock("@/lib/branding/saida", () => ({ marcaDaSaida: async () => ({ nome: "Marca da Revenda" }) }));
+vi.mock("@/lib/auth/politica-de-cadastro", () => ({ modoDeCadastro: async () => "aberto" }));
+vi.mock("@/lib/supabase/admin", () => ({ createAdminClient: () => ({}) }));
+vi.mock("@/lib/cobranca/cadastro", () => ({ lerCadastroNaTela: async () => ({ oferecidos: [] }) }));
+vi.mock("@/lib/branding/saida", () => ({
+  marcaDaSaida: async () => ({ nome: "Marca da Revenda" }),
+}));
 
 import HomePage from "./page";
 
@@ -35,11 +40,17 @@ describe("/ — a página inicial pública", () => {
   it("sem sessão: mostra a landing, links legais e acesso ao login", async () => {
     await montar();
 
-    expect(screen.getByRole("heading", { level: 1, name: "Boas conversas.Grandes negócios." })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Do primeiro contato à próxima venda." }),
+    ).toBeInTheDocument();
     expect(screen.getAllByText("Marca da Revenda").length).toBeGreaterThan(0);
-    expect(screen.getByText("Seu atendimento, suas oportunidades e sua equipe trabalhando juntos. Com inteligência artificial para transformar cada conversa em um próximo passo.")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Receba leads de anúncios e formulários, atenda pelo WhatsApp e acompanhe cada oportunidade até o fechamento.",
+      ),
+    ).toBeInTheDocument();
 
-    expect(screen.getByRole("link", { name: "Política de privacidade" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Dados do Google" })).toHaveAttribute(
       "href",
       "/legal/privacy#dados-do-google",
     );

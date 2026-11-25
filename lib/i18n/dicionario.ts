@@ -40,11 +40,13 @@ import { TEXTOS_AGENDA_SERVICOS } from "./agenda-servicos";
 import { TEXTOS_APARENCIA } from "./aparencia";
 import { TEXTOS_CONTRATACAO } from "./contratacao";
 import { TEXTOS_TABELA_DE_VALORES } from "./tabela-de-valores";
+import { TEXTOS_LANDING_PUBLICA } from "./landing-publica";
 
 /** `pt-BR` não aparece: é a chave. Só o que DIFERE precisa de linha. */
 type Traducoes = Record<string, Partial<Record<Exclude<Idioma, "pt-BR">, string>>>;
 
 export const DICIONARIO: Traducoes = {
+  ...TEXTOS_LANDING_PUBLICA,
   ...TEXTOS_CONTRATACAO,
   ...TEXTOS_TABELA_DE_VALORES,
   ...TEXTOS_CADENCIAS_ORIGINAIS,

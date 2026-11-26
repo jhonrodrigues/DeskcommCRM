@@ -1,10 +1,13 @@
 .site {
-  --paper: #faf9f5;
-  --ink: #192a25;
-  --muted: #4f6058;
-  --line: #d9dfd6;
-  --forest: #183c31;
-  --mint: #d8edba;
+  --paper: #f8faff;
+  --ink: #052349;
+  --muted: #465a74;
+  --line: #d7e2f0;
+  --action: #174f9e;
+  --action-hover: #123d7c;
+  --accent: #235da8;
+  --bright: #418deb;
+  --accent-on-dark: #94c6ff;
   background: var(--paper);
   color: var(--ink);
   min-height: 100svh;
@@ -12,7 +15,7 @@
 }
 
 .site :is(a, summary):focus-visible {
-  outline: 2px solid #3a795f;
+  outline: 2px solid var(--accent);
   outline-offset: 4px;
 }
 
@@ -97,13 +100,13 @@
   gap: 16px;
   border-radius: 5px;
   padding: 10px 17px;
-  background: var(--forest);
+  background: var(--action);
   color: white;
   font-size: 0.9rem;
   font-weight: 650;
 }
 .button:hover {
-  background: #285746;
+  background: var(--action-hover);
 }
 .button svg,
 .textLink svg {
@@ -128,7 +131,7 @@
   font-weight: 750;
   letter-spacing: 0.13em;
   text-transform: uppercase;
-  color: #38614e;
+  color: var(--accent);
 }
 .hero h1 {
   font-size: clamp(3.35rem, 6vw, 6.15rem);
@@ -147,10 +150,10 @@
 
 .journey {
   padding: clamp(22px, 4vw, 45px);
-  color: #f9faf5;
-  background: var(--forest);
+  color: #f7fbff;
+  background: var(--ink);
   border-radius: 9px;
-  box-shadow: 0 20px 42px #15382c19;
+  box-shadow: 0 20px 42px #0523491c;
 }
 .journeyHeader {
   display: flex;
@@ -165,7 +168,7 @@
   font-weight: 650;
 }
 .journeyHeader small {
-  color: #bcd2c2;
+  color: #c0d5ee;
   font-size: 0.72rem;
 }
 .timeline {
@@ -184,13 +187,13 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: var(--mint);
+  background: var(--bright);
   z-index: 1;
 }
 .timeline li:not(:last-child)::after {
   content: "";
   position: absolute;
-  background: #a5c5ae7d;
+  background: #94c6ff66;
   width: 1px;
   top: 25px;
   bottom: -26px;
@@ -201,7 +204,7 @@
   gap: 4px;
 }
 .timeline small {
-  color: var(--mint);
+  color: var(--accent-on-dark);
   font-size: 0.77rem;
 }
 .timeline strong {
@@ -247,7 +250,7 @@
   max-width: 650px;
 }
 .operation {
-  background: #e9efe5;
+  background: #eaf2ff;
 }
 .features {
   display: grid;
@@ -256,10 +259,10 @@
 }
 .features article {
   padding-top: 18px;
-  border-top: 1px solid #aebeb2;
+  border-top: 1px solid #bbcee8;
 }
 .features svg {
-  color: #38614e;
+  color: var(--accent);
 }
 .features h3 {
   margin-block: 15px 8px;
@@ -282,7 +285,7 @@
   padding: clamp(22px, 3vw, 34px);
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fffefb;
+  background: #ffffff;
 }
 .plan h3 {
   font-size: 1.24rem;
@@ -304,7 +307,7 @@
 .trial {
   margin-block: 12px 20px;
   font-weight: 650;
-  color: #38614e;
+  color: var(--accent);
 }
 .plan ul {
   display: grid;
@@ -322,7 +325,7 @@
 .plan li svg {
   align-self: center;
   flex: none;
-  color: #38614e;
+  color: var(--accent);
 }
 .plan .button {
   margin-top: auto;

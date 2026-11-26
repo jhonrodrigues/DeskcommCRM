@@ -458,3 +458,16 @@
     gap: 8px;
   }
 }
+
+.segmentButtons { display: flex; flex-wrap: wrap; gap: 9px; margin-bottom: 18px; }
+.segmentButtons button { border: 1px solid #cbdcf3; background: white; color: var(--ink); border-radius: 7px; padding: 9px 14px; font-weight: 700; cursor: pointer; }
+.segmentButtons button[aria-pressed="true"] { background: var(--ink); color: white; }
+.segmentButtons button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.segmentPanel { display: grid; grid-template-columns: 1fr 1fr; gap: 35px; padding: clamp(20px, 4vw, 46px); background: #eaf2ff; border: 1px solid var(--line); border-radius: 14px; }
+.segmentPanel h3 { font-size: clamp(23px, 3vw, 38px); }
+.segmentPanel ol { list-style: decimal; padding-left: 22px; margin-top: 20px; }
+.segmentPanel li { margin-block: 10px; }
+.segmentPanel blockquote { align-self: center; margin: 0; padding: 22px; background: white; border: 1px solid var(--line); border-radius: 10px; }
+.segmentPanel blockquote small { color: var(--muted); }
+.segmentPanel blockquote p { margin-top: 10px; }
+@media (max-width: 760px) { .segmentPanel { grid-template-columns: 1fr; } }

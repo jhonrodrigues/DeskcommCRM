@@ -140,7 +140,7 @@ export function LandingPublica({ marca, idioma, planos, modo }: Props) {
           <nav aria-label={t("Navegação principal")} className={styles.nav}>
             <a href="#captacao">{t("Captação")}</a>
             <a href="#recursos">{t("Recursos")}</a>
-            <a href="#solucoes">Soluções</a>
+            <a href="#solucoes">{t("Soluções")}</a>
             <a href="#planos">{t("Planos")}</a>
           </nav>
           <div className={styles.headerActions}>
@@ -208,7 +208,7 @@ export function LandingPublica({ marca, idioma, planos, modo }: Props) {
           </figure>
         </section>
 
-        <LandingSegmentos />
+        <LandingSegmentos idioma={idioma} />
 
         <section className={styles.section} id="captacao">
           <div className={styles.sectionHeading}>

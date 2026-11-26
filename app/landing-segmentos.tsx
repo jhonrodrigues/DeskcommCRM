@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { traduzir } from "@/lib/i18n/dicionario";
+import type { Idioma } from "@/lib/i18n/idiomas";
 import styles from "./landing-publica.module.css";
 
 const segmentos = [
@@ -10,31 +12,32 @@ const segmentos = [
   { nome: "Imobiliárias", titulo: "Do formulário à visita ao empreendimento.", mensagem: "Procuro dois quartos nessa região. Consigo visitar no sábado?", etapas: ["O interessado preenche o formulário do anúncio.", "A IA pergunta região, faixa de preço e disponibilidade.", "O corretor recebe o histórico e registra a visita na agenda."] },
 ] as const;
 
-export function LandingSegmentos() {
+export function LandingSegmentos({ idioma }: { idioma: Idioma }) {
+  const t = (texto: string) => traduzir(texto, idioma);
   const [selecionado, selecionar] = useState(0);
   const segmento = segmentos[selecionado] ?? segmentos[0];
 
   return (
     <section className={styles.section} id="solucoes">
       <div className={styles.sectionHeading}>
-        <h2>Veja o CRM na rotina da sua empresa.</h2>
-        <p>Escolha um segmento para acompanhar o caminho de um lead.</p>
+        <h2>{t("Veja o CRM na rotina da sua empresa.")}</h2>
+        <p>{t("Escolha um segmento para acompanhar o caminho de um lead.")}</p>
       </div>
-      <div className={styles.segmentButtons} aria-label="Segmentos">
+      <div className={styles.segmentButtons} aria-label={t("Segmentos")}>
         {segmentos.map((item, indice) => (
           <button key={item.nome} type="button" aria-pressed={selecionado === indice} onClick={() => selecionar(indice)}>
-            {item.nome}
+            {t(item.nome)}
           </button>
         ))}
       </div>
       <div className={styles.segmentPanel}>
         <div>
-          <h3>{segmento.titulo}</h3>
-          <ol>{segmento.etapas.map((etapa) => <li key={etapa}>{etapa}</li>)}</ol>
+          <h3>{t(segmento.titulo)}</h3>
+          <ol><li>{t(segmento.etapas[0])}</li><li>{t(segmento.etapas[1])}</li><li>{t(segmento.etapas[2])}</li></ol>
         </div>
         <blockquote>
-          <small>Exemplo fictício</small>
-          <p>{segmento.mensagem}</p>
+          <small>{t("Exemplo fictício")}</small>
+          <p>{t(segmento.mensagem)}</p>
         </blockquote>
       </div>
     </section>
